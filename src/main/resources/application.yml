@@ -1,0 +1,29 @@
+# ?? ?? ??
+server:
+  port: 8005
+
+# database ?? ??
+spring:
+  application:
+    name: shop-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MySQL_URL}
+#        jdbc:mysql://localhost:3306/board_board?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${MySQL_USERNAME}
+    password: ${MySQL_PASSWORD}
+  thymeleaf:
+    cache: false
+
+  jpa:
+    database: MySQL
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-time: 3600000000000
