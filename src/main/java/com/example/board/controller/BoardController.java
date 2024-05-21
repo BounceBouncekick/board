@@ -1,61 +1,79 @@
 package com.example.board.controller;
 
 
-import com.example.board.dto.BoardDTO;
+import com.example.board.EnumClass.BoardCategory;
+import com.example.board.dto.BoardCreateRequest;
 import com.example.board.service.BoardService;
+import com.example.board.service.LikeService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import java.io.IOException;
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+
+@Slf4j
 @Controller
+@RequestMapping("/boards")
 public class BoardController {
 
-    private BoardService boardService;
+    private final BoardService boardService;
 
-    @GetMapping("/save")
-    public String saveForm() {
-        return "save";
+    private final LikeService likeService;
+
+    public BoardController(BoardService boardService,LikeService likeService) {
+        this.boardService = boardService;
+        this.likeService = likeService;
     }
 
-    @PostMapping("/save")
-    public String save(@ModelAttribute BoardDTO boardDTO) throws IOException {
-        System.out.println("boardDTO = " + boardDTO);
-        boardService.save(boardDTO);
-        return "index";
+    @PostMapping("/{category}")
+    public ResponseEntity<String> boardWrite(@PathVariable String category, @ModelAttribute BoardCreateRequest req) throws IOException {
+        BoardCategory boardCategory = BoardCategory.of(category);
+        log.info("boardWrite_boardCategory :  {}", boardCategory);
+        log.info("req :{}", req.getBody());
+        log.info("req :{}", req.getTitle());
+        log.info("req :{}", req.getUploadImage());
+
+        boardService.writeBoard(req, boardCategory);
+
+        return new ResponseEntity<>("등록완료", HttpStatus.OK);
     }
 
-    @GetMapping("/List")
-    public String findAll(Model model) {
-        // DB에서 전체 게시글 데이터를 가져와서 list.html에 보여준다.
-        List<BoardDTO> boardDTOList = boardService.findAll();
-        model.addAttribute("boardList", boardDTOList);
-        return "list";
+    @GetMapping("delete/{uuid}")
+    public ResponseEntity<?> boardDelete(@PathVariable String uuid) {
+        boardService.delete(uuid);
+
+        return new ResponseEntity<>("삭제완료", HttpStatus.OK);
     }
 
-    @GetMapping("/update/{id}")
-    public String updateForm(@PathVariable Long id, Model model) {
-        BoardDTO boardDTO = boardService.findById(id);
-        model.addAttribute("boardUpdate", boardDTO);
-        return "update";
+    @GetMapping("/update/{uuid}")
+    public ResponseEntity<String> updatebyUuid(@PathVariable String uuid, @ModelAttribute BoardCreateRequest req,
+                                               @RequestParam(value = "image", required = false) MultipartFile imageFile)throws IOException {
+
+        log.info("컨트롤러 이미지 파일 수정 : {}", imageFile);
+        try {
+            boardService.update(uuid, req, imageFile);
+            return new ResponseEntity<>("수정완료", HttpStatus.OK);
+        }  catch (ResponseStatusException e) {
+            return new ResponseEntity<>(e.getReason(), e.getStatusCode());
+        } catch (IOException e) {
+            // 파일 업로드 중에 발생하는 예외 처리
+            return new ResponseEntity<>("파일 업로드 중에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PostMapping("/update")
-    public String update(@ModelAttribute BoardDTO boardDTO, Model model) {
-        BoardDTO board = boardService.updateBoard(boardDTO);
-        model.addAttribute("board", board);
-        return "detail";
-//        return "redirect:/board/" + boardDTO.getId();
+    @GetMapping("/like/{boardId}")
+    public ResponseEntity<String> addLike(@PathVariable Long boardId) {
+        likeService.addLike(boardId);
+        return new ResponseEntity<>("좋아요", HttpStatus.OK);
     }
 
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
-        boardService.delete(id);
-        return "redirect:/board/";
+    @GetMapping("/unlike/{boardId}")
+    public ResponseEntity<String> unlike(@PathVariable Long boardId) {
+        likeService.unlike(boardId);
+        return new ResponseEntity<>("좋아요 취소", HttpStatus.OK);
     }
-
 }

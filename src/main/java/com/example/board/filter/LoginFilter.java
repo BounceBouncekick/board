@@ -1,6 +1,9 @@
 package com.example.board.filter;
 
 import com.example.board.JWT.JWTUtil;
+import com.example.board.entity.RefreshEntity;
+import com.example.board.repository.RefreshRepository;
+import com.example.board.userdetails.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 @Slf4j
@@ -24,10 +28,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //JWTUtil 주입
     private final JWTUtil jwtUtil;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    private final RefreshRepository refreshRepository;
+
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil,RefreshRepository refreshRepository) {
 
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
     @Override
@@ -35,6 +42,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         //클라이언트 요청에서 username, password 추출
         String username = obtainUsername(request);
+        log.info("attempt 유저네임 : {}",username);
         String password = obtainPassword(request);
 
         //스프링 시큐리티에서 username과 password를 검증하기 위해서는 token에 담아야 함
@@ -46,10 +54,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authentication) {
 
-        //유저 정보
+        //UserDetailsS
         String username = authentication.getName();
+        log.info("successful_username : {}",username);
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -57,13 +69,29 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = auth.getAuthority();
 
         //토큰 생성
-        String access = jwtUtil.createJwt(username, role, 600000L);
-        String refresh = jwtUtil.createJwt(username, role, 86400000L);
+        String access = jwtUtil.createJwt("access", username, role, 600000L);
+        String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
+
+        //Refresh 토큰 저장
+        addRefreshEntity(username, refresh, 86400000L);
 
         //응답 설정
         response.setHeader("access", access);
+        log.info("success_full_access : {}", access);
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpStatus.OK.value());
+    }
+
+    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
+
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+
+        RefreshEntity refreshEntity = new RefreshEntity();
+        refreshEntity.setUsername(username);
+        refreshEntity.setRefresh(refresh);
+        refreshEntity.setExpiration(date.toString());
+
+        refreshRepository.save(refreshEntity);
     }
 
     //로그인 실패시 실행하는 메소드
@@ -72,7 +100,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         response.setStatus(401);
     }
-
     private Cookie createCookie(String key, String value) {
 
         Cookie cookie = new Cookie(key, value);

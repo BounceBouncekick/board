@@ -19,8 +19,6 @@ public class JoinService {
     }
 
     public void joinProcess(UserDTO userDTO) {
-
-
         String username = userDTO.getUsername();
         String password = userDTO.getPassword();
 
