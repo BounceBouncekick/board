@@ -19,7 +19,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Table(name = "board_user")
-@Setter
 public class UserEntity extends BaseEntity{
 
     @Id

@@ -7,9 +7,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -39,9 +36,6 @@ public class Board extends BaseEntity {
     @Column(name = "image_urls", length = 1000) // 이미지 URL들을 저장할 문자열 컬럼
     private String imageUrls; // 이미지 URL을 쉼표(,)로 구분하여 하나의 문자열로 저장
 
-
-    // 이미지 URL 추가 메서드
-    // 이미지 URL 추가 메서드
     public void addImageUrl(String imageUrl) {
         if (this.imageUrls == null) {
             this.imageUrls = imageUrl;
