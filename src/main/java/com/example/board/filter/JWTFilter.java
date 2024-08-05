@@ -1,6 +1,6 @@
 package com.example.board.filter;
 
-import com.example.board.JWT.JWTUtil;
+import com.example.board.jwt.JWTUtil;
 import com.example.board.entity.UserEntity;
 import com.example.board.userdetails.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,8 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-
 
 @Slf4j
 public class JWTFilter extends OncePerRequestFilter {

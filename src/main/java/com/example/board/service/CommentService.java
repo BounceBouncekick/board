@@ -1,7 +1,7 @@
 package com.example.board.service;
 
 
-import com.example.board.Exception.CommentNotFoundException;
+import com.example.board.exception.CommentNotFoundException;
 import com.example.board.dto.CommentCreateRequest;
 import com.example.board.entity.Board;
 import com.example.board.entity.Comment;

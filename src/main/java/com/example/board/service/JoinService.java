@@ -6,6 +6,7 @@ import com.example.board.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class JoinService {
 
@@ -26,7 +27,7 @@ public class JoinService {
 
         if (isExist) {
 
-            return;
+            throw new IllegalArgumentException("Username already exists");
         }
 
         UserEntity userEntity = UserEntity.builder()

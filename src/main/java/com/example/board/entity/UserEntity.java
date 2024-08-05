@@ -1,18 +1,11 @@
 package com.example.board.entity;
 
-import com.example.board.EnumClass.UserRole;
 import com.example.board.dto.UserDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,7 +18,15 @@ public class UserEntity extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotEmpty(message = "아이디는 필수 항목입니다.")
+    @Size(min=2, message = "아이디는 최소 두 글자 이상입니다")
+    @Column(nullable = false,unique = true)
     private String username;
+
+    @NotEmpty(message = "비밀번호는 필수 항목입니다.")
+//    @Pattern(regexp = " ^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d~!@#$%^&*()+|=]{8,20}$",
+//            message = "8자 이상이며 최대 20자까지 허용. 반드시 숫자, 문자 포함")
+    @Column(nullable = false)
     private String password;
 
     private String role;
@@ -37,8 +38,6 @@ public class UserEntity extends BaseEntity{
         this.password = password;
         this.role = role;
     }
-
-
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Board> boards;     // 작성글

@@ -1,4 +1,4 @@
-package com.example.board.EnumClass;
+package com.example.board.enumclass;
 
 public enum ErrorCode {
     FILE_VALID_ERROR("File validation error"),

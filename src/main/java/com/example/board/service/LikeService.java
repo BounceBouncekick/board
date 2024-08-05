@@ -1,6 +1,6 @@
 package com.example.board.service;
 
-import com.example.board.Exception.BoardNotFoundException;
+import com.example.board.exception.BoardNotFoundException;
 import com.example.board.entity.Board;
 import com.example.board.repository.BoardRepository;
 import jakarta.transaction.Transactional;
@@ -16,11 +16,12 @@ public class LikeService {
     }
 
     @Transactional
-    public void addLike(Long boardId) {
+    public int addLike(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BoardNotFoundException("해당 ID로 게시판을 찾을 수 없습니다: " + boardId));
         board.incrementLikeCount();
         boardRepository.save(board);  // 변경 사항 저장
+        return board.getLikeCount();  // 좋아요 수 반환
     }
 
     @Transactional

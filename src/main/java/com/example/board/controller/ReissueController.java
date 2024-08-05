@@ -1,6 +1,6 @@
 package com.example.board.controller;
 
-import com.example.board.JWT.JWTUtil;
+import com.example.board.jwt.JWTUtil;
 import com.example.board.entity.RefreshEntity;
 import com.example.board.repository.RefreshRepository;
 import io.jsonwebtoken.ExpiredJwtException;

@@ -1,8 +1,7 @@
 package com.example.board.config;
 
-import com.example.board.JWT.CustomLogoutFilter;
-import com.example.board.JWT.JWTUtil;
-import com.example.board.entity.RefreshEntity;
+import com.example.board.jwt.CustomLogoutFilter;
+import com.example.board.jwt.JWTUtil;
 import com.example.board.filter.JWTFilter;
 import com.example.board.filter.LoginFilter;
 import com.example.board.repository.RefreshRepository;
@@ -55,21 +54,24 @@ public class SecurityConfig {
         http
                 .csrf((auth) -> auth.disable());
 
+//        http.formLogin(Customizer.withDefaults());
+
         http
                 .formLogin(form -> form.disable());
-//                        .loginPage("/boards/login")
-//                        .permitAll()
+
+
         http
                 .httpBasic((auth) -> auth.disable());
 
+
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers( "/board/join","/login").permitAll()
-                        .requestMatchers("/reissue").permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/admin")).hasRole("ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/boards/free")).hasRole("ADMIN")
-                        .anyRequest().authenticated());
-//                        .anyRequest().permitAll());
+//                        .requestMatchers( "/board/join","/login").permitAll()
+//                        .requestMatchers("/reissue").permitAll()
+//                        .requestMatchers(new AntPathRequestMatcher("/admin")).hasRole("ADMIN")
+//                        .requestMatchers(new AntPathRequestMatcher("/boards/free")).hasRole("ADMIN")
+//                        .anyRequest().authenticated());
+                        .anyRequest().permitAll());
 
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);

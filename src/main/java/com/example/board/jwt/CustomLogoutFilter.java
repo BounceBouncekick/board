@@ -1,4 +1,4 @@
-package com.example.board.JWT;
+package com.example.board.jwt;
 
 import com.example.board.repository.RefreshRepository;
 import io.jsonwebtoken.ExpiredJwtException;

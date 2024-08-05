@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>게시글 작성</h1>
+<form id="postForm" action="/boards/{category}" method="post" enctype="multipart/form-data">
+    <label for="category">카테고리:</label>
+    <select id="category" name="category" required>
+        <option value="FREE">free</option>
+        <option value="GREETING">Greeting</option>
+        <!-- 기타 카테고리 옵션 추가 -->
+    </select>
+    <br><br>
+
+    <label for="title">제목:</label>
+    <input type="text" id="title" name="title" th:value="${boardCreateRequest.title}" required><br><br>
+
+    <label for="body">내용:</label>
+    <textarea id="body" name="body" rows="10" cols="30" th:text="${boardCreateRequest.body}" required></textarea><br><br>
+
+    <label for="uploadImage">이미지 업로드:</label>
+    <input type="file" id="uploadImage" name="uploadImage"><br><br>
+
+    <input type="submit" value="등록">
+</form>
+</body>
+</html>

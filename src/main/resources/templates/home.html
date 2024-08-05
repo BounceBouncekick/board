@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <style>
+        /* 버튼 스타일링 */
+        .signup-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff; /* 파란색 배경 */
+            border: none;
+            border-radius: 5px; /* 둥근 모서리 */
+            cursor: pointer;
+        }
+        .signup-button:hover {
+            background-color: #0056b3; /* 호버 시 배경색 변경 */
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome to Home Page</h1>
+<button class="signup-button" onclick="window.location.href='/boards/join'">회원가입</button>
+<button class="signup-button" onclick="window.location.href='/login'">로그인</button>
+<button class="signup-button" onclick="window.location.href='/boards/write'">글쓰기</button>
+
+</body>
+</html>

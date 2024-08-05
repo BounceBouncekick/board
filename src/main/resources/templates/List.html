@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 목록</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- 스타일시트 링크, 필요시 추가 -->
+    <script>
+        function deleteBoard(uuid) {
+            if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            fetch(`/boards/delete/${uuid}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('삭제가 완료되었습니다.');
+                    location.reload();
+                } else {
+                    alert('삭제에 실패하였습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('삭제 중 오류가 발생하였습니다.');
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>게시판 목록</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>제목</th>
+            <th>내용</th>
+            <th>이미지</th>
+            <th>삭제</th> <!-- 삭제 버튼 열 추가 -->
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 게시글 목록을 반복하여 테이블에 출력 -->
+        <tr th:each="board : ${boardList}">
+            <td th:text="${board.title}">제목</td>
+            <td th:text="${board.body}">내용</td>
+            <td>
+                <!-- 이미지가 있으면 표시 -->
+                <div th:if="${board.imageUrls}">
+                    <img th:each="imageUrl : ${board.imageUrls}"
+                         th:src="@{${imageUrl}}"
+                         alt="이미지" width="100">
+                </div>
+            </td>
+            <td>
+                <button type="button" th:attr="data-uuid=${board.uuid}" onclick="deleteBoard(this.getAttribute('data-uuid'))">삭제</button>
+            </td> <!-- 삭제 버튼 추가 -->
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 게시글 작성 페이지로 이동하는 버튼 -->
+    <div>
+        <a href="/board/create" class="btn">새 글 작성</a>
+    </div>
+</div>
+</body>
+</html>

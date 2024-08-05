@@ -1,9 +1,8 @@
 package com.example.board.filter;
 
-import com.example.board.JWT.JWTUtil;
+import com.example.board.jwt.JWTUtil;
 import com.example.board.entity.RefreshEntity;
 import com.example.board.repository.RefreshRepository;
-import com.example.board.userdetails.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -31,10 +32,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final RefreshRepository refreshRepository;
 
     public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil,RefreshRepository refreshRepository) {
-
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
+        setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST")); // 로그인 엔드포인트 설정
     }
 
     @Override

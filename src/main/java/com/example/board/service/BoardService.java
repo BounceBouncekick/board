@@ -1,14 +1,13 @@
 package com.example.board.service;
 
-import com.example.board.EnumClass.BoardCategory;
+import com.example.board.enumclass.BoardCategory;
 import com.example.board.dto.BoardCreateRequest;
+import com.example.board.dto.BoardDetailResponse;
 import com.example.board.entity.Board;
-import com.example.board.entity.UserEntity;
 import com.example.board.repository.BoardRepository;
 import com.example.board.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -62,12 +62,14 @@ public class BoardService {
     }
 
     @Transactional
-    public void delete(String uuid){
+    public void delete(String uuid) {
         Optional<Board> optionaluuid = boardRepository.findByUuid(uuid);
 
-        if(optionaluuid.isPresent()){
+        if (optionaluuid.isPresent()) {
             Board boardDelete = optionaluuid.get();
             boardRepository.delete(boardDelete);
+        } else {
+            throw new IllegalArgumentException("해당 UUID의 게시글을 찾을 수 없습니다.");
         }
     }
 
@@ -80,6 +82,30 @@ public class BoardService {
             Board boardUpdate = optionaluuid.get();
             String imageUrls = awsS3Service.uploadFile(imageFile);
             boardRepository.updateBoardByUUID(uuid, req.getBody(), req.getTitle(),imageUrls);
+        }
+    }
+
+    public List<BoardCreateRequest> findAll() {
+        List<Board> boardEntityList = boardRepository.findAll();
+        List<BoardCreateRequest> boardDTOList = boardEntityList.stream()
+                .map(board -> BoardCreateRequest.builder()
+                        .title(board.getTitle())
+                        .body(board.getBody())
+                        .imageUrls(board.getImageUrls()) // 이미지 URL 리스트 추가
+                        .uuid(board.getUuid()) // uuid 추가
+                        .build())
+                .collect(Collectors.toList());
+
+        return boardDTOList;
+    }
+
+    public BoardDetailResponse getBoardDetail(String uuid) {
+        Optional<Board> boardOptional = boardRepository.findByUuid(uuid);
+        if (boardOptional.isPresent()) {
+            Board board = boardOptional.get();
+            return BoardDetailResponse.fromEntity(board);
+        } else {
+            throw new IllegalArgumentException("게시글을 찾을 수 없습니다. UUID: " + uuid);
         }
     }
 }

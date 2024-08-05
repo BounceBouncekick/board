@@ -1,6 +1,6 @@
-package com.example.board.Exception;
+package com.example.board.exception;
 
-import com.example.board.EnumClass.ErrorCode;
+import com.example.board.enumclass.ErrorCode;
 
 public class BusinessException extends RuntimeException {
     private ErrorCode errorCode;

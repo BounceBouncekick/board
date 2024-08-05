@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <script>
+        function validateForm() {
+            var username = document.forms["joinForm"]["username"].value;
+            var password = document.forms["joinForm"]["password"].value;
+
+            if (username == "") {
+                alert("아이디를 입력해 주세요.");
+                return false;
+            }
+
+            if (password.length < 8 || password.length > 20) {
+                alert("비밀번호는 8자 이상 20자 이하로 입력해 주세요.");
+                return false;
+            }
+
+            var numberCheck = /\d/;
+            var letterCheck = /[a-zA-Z]/;
+            if (!numberCheck.test(password) || !letterCheck.test(password)) {
+                alert("비밀번호에는 숫자와 문자가 모두 포함되어야 합니다.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+
+<form name="joinForm" action="/boards/join" method="post" onsubmit="return validateForm()">
+    아이디 : <input type="text" name="username" required maxlength="20"><br>
+    비밀번호 : <input type="password" name="password" required maxlength="20"><br>
+    <input type="submit" value="회원가입">
+</form>
+
+</body>
+</html>

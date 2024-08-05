@@ -1,12 +1,15 @@
 package com.example.board.entity;
 
-import com.example.board.EnumClass.BoardCategory;
+import com.example.board.enumclass.BoardCategory;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -33,15 +36,17 @@ public class Board extends BaseEntity {
 
     private int likeCount;  // 좋아요 수를 저장하는 필드
 
-    @Column(name = "image_urls", length = 1000) // 이미지 URL들을 저장할 문자열 컬럼
-    private String imageUrls; // 이미지 URL을 쉼표(,)로 구분하여 하나의 문자열로 저장
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "board_image_urls", joinColumns = @JoinColumn(name = "board_id"))
+    @Column(name = "image_url")
+    private List<String> imageUrls = new ArrayList<>(); // 이미지 URL을 리스트로 저장
 
     public void addImageUrl(String imageUrl) {
-        if (this.imageUrls == null) {
-            this.imageUrls = imageUrl;
-        } else {
-            this.imageUrls += "," + imageUrl; // 기존 이미지 URL 뒤에 추가
-        }
+        this.imageUrls.add(imageUrl); // 이미지 URL을 리스트에 추가
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
     @Builder

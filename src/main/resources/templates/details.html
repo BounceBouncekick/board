@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>게시글 상세보기</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>게시글 상세보기</h1>
+<div>
+    <label><strong>제목:</strong></label>
+    <span th:text="${board.title}">제목</span>
+</div>
+<div>
+    <label><strong>본문:</strong></label>
+    <p th:text="${board.body}">본문</p>
+</div>
+<div>
+    <label><strong>좋아요:</strong></label>
+    <span id="likeCount" th:text="${board.likeCount}">0</span>
+    <!-- 좋아요 버튼 클릭 시 addLike 함수 호출 -->
+    <button type="button" id="likeButton" th:attr="data-board-id=${board.id}">좋아요</button>
+</div>
+<div>
+    <h3>이미지</h3>
+    <ul>
+        <!-- 이미지 URL 목록을 순회하며 이미지 출력 -->
+        <li th:each="imageUrl : ${board.imageUrls}">
+            <img th:src="${imageUrl}" alt="이미지" width="200">
+        </li>
+    </ul>
+</div>
+<!-- JavaScript 코드 -->
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // 좋아요 버튼 클릭 이벤트 등록
+        const likeButton = document.getElementById('likeButton');
+        if (likeButton) {
+            likeButton.addEventListener('click', function() {
+                const boardId = this.getAttribute('data-board-id');
+                console.log('Button clicked with boardId:', boardId);
+                addLike(boardId);
+            });
+        } else {
+            console.error('likeButton element not found!');
+        }
+    });
+
+    // 좋아요 버튼 클릭 시 fetch를 사용하여 요청을 보내는 함수
+    function addLike(boardId) {
+        console.log('addLike function called with boardId:', boardId);
+        const likeCountSpan = document.getElementById('likeCount');
+        const currentLikeCount = parseInt(likeCountSpan.innerText, 10);
+        likeCountSpan.innerText = currentLikeCount + 1;
+
+        // fetch 요청을 보냅니다.
+        fetch(`/boards/like?boardId=${boardId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Response received:', response);
+            if (!response.ok) {
+                console.error('Error response details:', response);
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success! New like count:', data);
+            if (data && data.likeCount !== undefined) {
+        // 좋아요 개수를 업데이트합니다.
+                likeCountSpan.innerText = data.likeCount;
+            } else {
+                console.error('Unexpected response data:', data);
+                alert('Unexpected response format.');
+                likeCountSpan.innerText = currentLikeCount;
+            }
+        })
+        .catch(error => {
+            console.error('Error occurred:', error);
+            alert('좋아요를 실패했습니다.');
+            likeCountSpan.innerText = currentLikeCount;
+        });
+    }
+</script>
+</body>
+</html>
