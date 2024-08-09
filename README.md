@@ -38,3 +38,4 @@
 
 
 # ERD
+![게시판](https://github.com/user-attachments/assets/be9ca161-be67-4d6e-bee1-70529cd0e03e)
