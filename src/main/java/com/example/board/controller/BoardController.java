@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -98,6 +97,6 @@ public class BoardController {
     public String getBoardDetail(@PathVariable String uuid, Model model) {
         BoardDetailResponse boardDetail = boardService.getBoardDetail(uuid);
         model.addAttribute("board", boardDetail);
-        return "details"; // 여기서 'boards/details'는 src/main/resources/templates/boards/details.html을 의미합니다.
+        return "details";
     }
 }

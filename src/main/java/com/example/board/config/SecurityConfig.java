@@ -22,7 +22,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
 
     //JWTUtil 주입
@@ -54,8 +53,6 @@ public class SecurityConfig {
         http
                 .csrf((auth) -> auth.disable());
 
-//        http.formLogin(Customizer.withDefaults());
-
         http
                 .formLogin(form -> form.disable());
 
@@ -66,21 +63,18 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-//                        .requestMatchers( "/board/join","/login").permitAll()
-//                        .requestMatchers("/reissue").permitAll()
-//                        .requestMatchers(new AntPathRequestMatcher("/admin")).hasRole("ADMIN")
-//                        .requestMatchers(new AntPathRequestMatcher("/boards/free")).hasRole("ADMIN")
-//                        .anyRequest().authenticated());
-                        .anyRequest().permitAll());
+                        .requestMatchers( "/board/join","/login").permitAll()
+                        .requestMatchers("/reissue").permitAll()
+                       .requestMatchers(new AntPathRequestMatcher("/admin")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/boards/free")).hasRole("ADMIN")
+                        .anyRequest().authenticated());
 
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
-        //JWTFilter 등록
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
 
-        //필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,refreshRepository),UsernamePasswordAuthenticationFilter.class);
 
@@ -88,11 +82,6 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-
-
-
-
         return http.build();
     }
-
 }
