@@ -15,8 +15,10 @@ public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "c_id")
     private Long id;
 
+    @Column(name = "c_body")
     private String body;
 
     @Builder
